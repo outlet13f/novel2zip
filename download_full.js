@@ -45,23 +45,13 @@ const notify = (message) => {
     }
     return undefined;
   };
-  // 실행마다 새 임시 프로필 사용 (실행 중 백그라운드↔창 전환 시에는 같은 프로필 공유)
-  const PROFILE_PREFIX = 'novel2zip-profile-';
-  const tmpRoot = require('os').tmpdir();
-  // 이전 실행이 강제 종료되며 남긴 Chrome/임시 프로필 정리 (스크래퍼는 한 번에 하나만 실행됨)
-  try { require('child_process').execFileSync('pkill', ['-f', PROFILE_PREFIX]); } catch (e) {}
-  for (const d of fs.readdirSync(tmpRoot)) {
-    if (d.startsWith(PROFILE_PREFIX)) {
-      try { fs.rmSync(path.join(tmpRoot, d), { recursive: true, force: true }); } catch (e) {}
-    }
-  }
-  const runDir = fs.mkdtempSync(path.join(tmpRoot, PROFILE_PREFIX));
-  const userDataDir = path.join(runDir, 'profile');
-  const cleanupProfile = () => {
-    try { require('child_process').execFileSync('pkill', ['-f', runDir]); } catch (e) {}
-    try { fs.rmSync(runDir, { recursive: true, force: true }); } catch (e) {}
-  };
-  // 캡차 통과 기록이 세션 쿠키일 수 있음 → 실행 중 브라우저를 다시 띄울 때 사라지지 않도록 저장/복원
+  // 실행이 끝나도 지우지 않는 고정 프로필 사용 → 서버 재시작/다음 작품에서도 캡차 통과 기록 유지
+  // (실행 중 백그라운드↔창 전환 시에도 같은 프로필 공유)
+  const { BROWSER_DATA_DIR: runDir, PROFILE_DIR: userDataDir, killProfileBrowsers } = require('./browser_profile');
+  fs.mkdirSync(userDataDir, { recursive: true });
+  // 이전 실행이 강제 종료되며 남긴 Chrome 정리 (스크래퍼는 한 번에 하나만 실행됨)
+  killProfileBrowsers();
+  // 캡차 통과 기록이 세션 쿠키일 수 있음 → 브라우저를 다시 띄우거나 다음 실행 때 사라지지 않도록 저장/복원
   const cookiesPath = path.join(runDir, 'session-cookies.json');
   const saveCookies = async (b) => {
     try {
@@ -113,7 +103,7 @@ const notify = (message) => {
   const shutdown = async () => {
     await saveCookies(browser);
     try { await browser.close(); } catch (e) {}
-    cleanupProfile();
+    killProfileBrowsers();
     process.exit(1);
   };
   process.on('SIGTERM', shutdown);
@@ -227,7 +217,7 @@ const notify = (message) => {
   if (episodes.length === 0) {
     console.error('No episodes found on the page! Maybe we need to fetch via API.');
     await browser.close();
-    cleanupProfile();
+    killProfileBrowsers();
     process.exit(1);
   }
 
@@ -337,7 +327,7 @@ const notify = (message) => {
   }
 
   await browser.close();
-  cleanupProfile();
+  killProfileBrowsers();
   console.log('Download complete.');
 
   // Automatically generate EPUB

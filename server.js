@@ -214,7 +214,7 @@ app.post('/api/stop', (req, res) => {
     setTimeout(() => {
       if (proc.exitCode === null && proc.signalCode === null) {
         try { proc.kill('SIGKILL'); } catch(e) {}
-        try { require('child_process').execFileSync('pkill', ['-f', 'novel2zip-profile-']); } catch(e) {}
+        require('./browser_profile').killProfileBrowsers();
       }
     }, 5000);
     stoppedByUser = true;
