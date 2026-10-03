@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "basic-ftp": "^6.2.0",
+    "cors": "^2.8.6",
+    "epub-gen": "^0.1.0",
+    "express": "^5.2.1",
+    "puppeteer": "^24.43.1",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "devDependencies": {
+    "electron": "^41.7.1",
+    "electron-builder": "^26.15.3",
+    "electron-installer-dmg": "^5.0.1"
+  },
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --mac"
+  },
+  "build": {
+    "appId": "com.novel2zip.app",
+    "mac": {
+      "category": "public.app-category.utilities"
+    }
+  }
+}

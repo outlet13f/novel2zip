@@ -1,0 +1,17 @@
+# Dependencies & build output
+node_modules/
+dist/
+
+# OS / logs
+.DS_Store
+*.log
+
+# Local runtime data (personal paths, reading history, credentials)
+settings.json
+history.json
+queue.json
+episodes.json
+config.json
+cookies.json
+Download/
+Ebook/

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novel Downloader</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>Novel Downloader</h1>
+      <p>Enter the main URL of the comic to start scraping.</p>
+    </header>
+
+    <div class="card">
+      <form id="scraper-form">
+        <div class="form-group">
+
+          <input type="url" id="url" name="url" placeholder="https://..." required>
+        </div>
+        <div class="form-group">
+          <label for="chunk-size">EBOOK 분할 단위 (화 수, 0 = 분할 안 함)</label>
+          <input type="number" id="chunk-size" name="chunkSize" min="0" step="1" value="500" required>
+        </div>
+        
+
+
+        <div class="actions">
+          <button type="submit" id="start-btn" class="btn primary">시작</button>
+          <button type="button" id="queue-add-btn" class="btn secondary">대기열 추가</button>
+          <button type="button" id="stop-btn" class="btn danger" disabled>중지</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card" id="queue-card" style="display: none;">
+      <div class="queue-header">
+        <h2>대기열 <span id="queue-count" class="queue-count"></span></h2>
+        <button type="button" id="queue-start-btn" class="btn primary">대기열 시작</button>
+      </div>
+      <p class="queue-hint">현재 작품이 끝나면 위에서부터 차례로 자동 시작합니다. 중지 버튼을 누르면 대기열도 멈춥니다.</p>
+      <ol id="queue-list" class="queue-list"></ol>
+    </div>
+
+    <div class="card" id="history-card" style="margin-bottom: 20px; display: none;">
+      <h2>수집 소설 이력</h2>
+      <ul id="history-list" style="list-style: none; padding: 0; margin-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <!-- history items -->
+      </ul>
+    </div>
+
+    <div class="card" id="settings-card" style="margin-bottom: 20px;">
+      <h2>저장 경로 설정</h2>
+      <form id="settings-form" style="margin-top: 16px;">
+        <div class="form-group">
+          <label for="download-path">텍스트 다운로드 폴더 경로 (초기값 빈값)</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="download-path" placeholder="/Users/steve/Dev/novel2zip/Download" style="flex: 1;">
+            <button type="button" class="btn primary" onclick="selectFolder('download-path')">폴더 선택</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="ebook-path">Ebook 저장 폴더 경로 (초기값 빈값)</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="ebook-path" placeholder="/Users/steve/Dev/novel2zip/Ebook" style="flex: 1;">
+            <button type="button" class="btn primary" onclick="selectFolder('ebook-path')">폴더 선택</button>
+          </div>
+        </div>
+        <div class="actions" style="margin-top: 12px;">
+          <button type="button" id="settings-save-btn" class="btn primary">경로 저장</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card" id="current-novel-card" style="display: none; margin-bottom: 20px;">
+      <h2>현재 수집 중인 소설</h2>
+      <div id="current-novel-info" style="margin-top: 16px;"></div>
+    </div>
+
+    <div class="card terminal-card">
+      <div class="terminal-header">
+        <div class="mac-btns">
+          <span class="mac-btn red"></span>
+          <span class="mac-btn yellow"></span>
+          <span class="mac-btn green"></span>
+        </div>
+        <div class="terminal-title">진행 로그</div>
+      </div>
+      <div id="progress-container" style="display: none; padding: 10px 15px; border-bottom: 1px solid #333; background: #1e1e1e;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85rem; color: #a1a1aa;">
+          <span id="progress-text">수집 준비 중...</span>
+          <span id="progress-percent">0%</span>
+        </div>
+        <div style="width: 100%; background: #3f3f46; border-radius: 4px; height: 8px; overflow: hidden;">
+          <div id="progress-bar" style="width: 0%; height: 100%; background: #3b82f6; transition: width 0.3s ease;"></div>
+        </div>
+      </div>
+      <div class="terminal-body" id="log-container">
+        <!-- Logs will appear here -->
+      </div>
+    </div>
+
+
+
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
